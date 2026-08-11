@@ -93,6 +93,18 @@ body {
   margin: 0.5rem 0 0;
 }
 
+.auth-switch {
+  margin-top: 1rem;
+  font-size: 0.875rem;
+  color: #667085;
+}
+
+.auth-switch a {
+  color: #4f46e5;
+  font-weight: 600;
+  text-decoration: none;
+}
+
 .dashboard-nav {
   display: flex;
   gap: 1rem;

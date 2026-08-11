@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import type { FormEvent } from 'react';
-import { Navigate, useLocation, useNavigate } from 'react-router-dom';
+import { Link, Navigate, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
 import { ApiError } from '../services/api';
 
@@ -77,6 +77,10 @@ export function Login() {
         <button type="submit" disabled={isSubmitting}>
           {isSubmitting ? 'Signing in…' : 'Log in'}
         </button>
+
+        <p className="auth-switch">
+          Don't have an account? <Link to="/register">Create one</Link>
+        </p>
       </form>
     </div>
   );

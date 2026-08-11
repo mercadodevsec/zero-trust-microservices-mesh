@@ -9,6 +9,12 @@ export interface LoginCredentials {
   password: string;
 }
 
+export interface RegisterInput {
+  name: string;
+  email: string;
+  password: string;
+}
+
 export interface LoginResponse {
   message: string;
   token: string;
