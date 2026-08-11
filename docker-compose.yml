@@ -1,0 +1,56 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: basic_app_postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: basic_app
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  backend:
+    build: ./backend
+    container_name: basic_app_backend
+    restart: unless-stopped
+    # DATABASE_URL, JWT_SECRET, JWT_EXPIRES_IN, CORS_ORIGIN all come from
+    # backend/.env — never hardcoded here or in the Dockerfile.
+    env_file:
+      - ./backend/.env
+    environment:
+      # Inside the Docker network, Postgres is reachable by service name —
+      # not localhost — so this overrides whatever's in backend/.env.
+      DATABASE_URL: postgres://postgres:postgres@postgres:5432/basic_app
+      CORS_ORIGIN: http://localhost:5173
+    ports:
+      - "3000:3000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  frontend:
+    build:
+      context: ./frontend
+      args:
+        # Vite bakes VITE_* vars into the bundle at build time, so this must
+        # be a build arg, not a runtime `environment:` entry. The browser
+        # calls this URL directly, so it must be reachable from the host
+        # (not the internal Docker service name).
+        VITE_API_URL: http://localhost:3000
+    container_name: basic_app_frontend
+    restart: unless-stopped
+    ports:
+      - "5173:4173"
+    depends_on:
+      - backend
+
+volumes:
+  pgdata:
